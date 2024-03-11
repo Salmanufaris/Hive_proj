@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_application_1/model/hive_model.dart';
 import 'package:flutter_application_1/model/model.dart';
+import 'package:hive/hive.dart';
 
 class Apiservice {
   Dio dio = Dio();
@@ -22,5 +24,15 @@ class Apiservice {
     } catch (error) {
       throw Exception("Failed to fetch data: $error");
     }
+  }
+
+  Future<List<EmployeeModel>> getAllFavourite() async {
+    final favoriteBox = await Hive.openBox<EmployeeModel>('favorites');
+    return favoriteBox.values.toList();
+  }
+
+  Future<void> addToFavourite(EmployeeModel data) async {
+    final favoriteBox = await Hive.openBox<EmployeeModel>('favorites');
+    await favoriteBox.add(data);
   }
 }

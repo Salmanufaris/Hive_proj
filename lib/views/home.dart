@@ -1,6 +1,6 @@
-// ignore_for_file: use_key_in_widget_constructors
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/controller/home_provider.dart';
+import 'package:flutter_application_1/model/hive_model.dart';
 import 'package:flutter_application_1/model/model.dart';
 import 'package:flutter_application_1/views/favourite.dart';
 import 'package:provider/provider.dart';
@@ -10,19 +10,22 @@ class Homescreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pro = Provider.of<Homeprovider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         actions: [
           TextButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => Favrscreen()));
-              },
-              child: const Text("favourite"))
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => Favrscreen()),
+              );
+            },
+            child: const Text("Favorites"),
+          )
         ],
       ),
       body: FutureBuilder<List<Model>>(
-        future: Provider.of<Homeprovider>(context, listen: false).loadnotes(),
+        future: pro.loadnotes(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -39,8 +42,13 @@ class Homescreen extends StatelessWidget {
                     child: ListTile(
                       trailing: IconButton(
                         onPressed: () {
-                          Provider.of<Homeprovider>(context, listen: false)
-                              .addToFavorites(item);
+                          final employ = EmployeeModel(
+                              id: item.id!,
+                              email: item.email!,
+                              firstname: item.firstname!,
+                              lastname: item.lastname!,
+                              image: item.image!);
+                          pro.addToFavourite(employ, context);
                         },
                         icon: const Icon(
                           Icons.favorite_border_outlined,

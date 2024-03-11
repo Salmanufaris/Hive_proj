@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/model/hive_model.dart';
 import 'package:flutter_application_1/model/model.dart';
 import 'package:flutter_application_1/service/api_service.dart';
-import 'package:hive/hive.dart';
 
 class Homeprovider extends ChangeNotifier {
+  ValueNotifier<List<EmployeeModel>> favouriteNotifier = ValueNotifier([]);
+  List<EmployeeModel> favoriteItems = [];
   List<Model> noteList = [];
+  final Apiservice apiservice = Apiservice();
 
   Future<List<Model>> loadnotes() async {
     try {
@@ -18,18 +20,16 @@ class Homeprovider extends ChangeNotifier {
     return noteList;
   }
 
-  Future<List<EmployeeModel>> getAllEmployee() async {
-    final employeeDB = await Hive.openBox<EmployeeModel>('favorites');
-    return employeeDB.values.toList();
+  Future<void> getAllFavourite() async {
+    favoriteItems = await apiservice.getAllFavourite();
+    notifyListeners();
   }
 
-  Future<void> addToFavorites(Model item) async {
-    try {
-      var box = await Hive.openBox<Model>('favorites');
-      await box.put(item.id, item);
-      print('Item added to favorites: ${item.id}');
-    } catch (error) {
-      print('Error adding item to favorites: $error');
-    }
+  addToFavourite(EmployeeModel data, context) async {
+    await apiservice.addToFavourite(data);
+    bool isAlreadyInFavorites = favoriteItems.contains(data);
+    if (!isAlreadyInFavorites) {}
+    getAllFavourite();
+    notifyListeners();
   }
 }
